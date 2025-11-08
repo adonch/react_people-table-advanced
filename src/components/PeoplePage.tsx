@@ -1,12 +1,33 @@
-import { PeopleFilters } from './PeopleFilters';
+import React, { useEffect } from 'react';
 import { Loader } from './Loader';
-import { PeopleTable } from './PeopleTable';
+import '../App.scss';
+import { getPeople } from '../api';
+import PeopleTable from './PeopleTable';
+import { Person } from '../types';
+import { PeopleFilters } from './PeopleFilters';
 
-export const PeoplePage = () => {
+const PeoplePage = () => {
+  const [people, setPeople] = React.useState<Person[]>([]);
+  const [loading, setLoading] = React.useState(false);
+  const [loadingError, setLoadingError] = React.useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    getPeople()
+      .then(data => {
+        setPeople(data);
+      })
+      .catch(() => {
+        setLoadingError(true);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
   return (
     <>
       <h1 className="title">People Page</h1>
-
       <div className="block">
         <div className="columns is-desktop is-flex-direction-row-reverse">
           <div className="column is-7-tablet is-narrow-desktop">
@@ -15,19 +36,26 @@ export const PeoplePage = () => {
 
           <div className="column">
             <div className="box table-container">
-              <Loader />
-
-              <p data-cy="peopleLoadingError">Something went wrong</p>
-
-              <p data-cy="noPeopleMessage">There are no people on the server</p>
-
-              <p>There are no people matching the current search criteria</p>
-
-              <PeopleTable />
+              {loading ? (
+                <Loader />
+              ) : loadingError ? (
+                <p data-cy="peopleLoadingError" className="has-text-danger">
+                  Something went wrong
+                </p>
+              ) : people.length === 0 ? (
+                <p data-cy="noPeopleMessage">
+                  There are no people on the server
+                </p>
+              ) : (
+                <PeopleTable people={people} />
+              )}
             </div>
+            {people.length > 0 && <PeopleFilters />}
           </div>
         </div>
       </div>
     </>
   );
 };
+
+export default PeoplePage;
