@@ -23,6 +23,8 @@ export const PeopleFilters = () => {
     });
   };
 
+  const centuriesList = ['16', '17', '18', '19', '20'] as const;
+
   return (
     <nav className="panel">
       <p className="panel-heading">Filters</p>
@@ -70,51 +72,30 @@ export const PeopleFilters = () => {
       <div className="panel-block">
         <div className="level is-flex-grow-1 is-mobile" data-cy="CenturyFilter">
           <div className="level-left">
-            <SearchLink
-              data-cy="century"
-              className={`button mr-1 ${activeCenturies.includes('16') ? 'is-info' : ''}`}
-              params={{ centuries: '16' }}
-            >
-              16
-            </SearchLink>
-
-            <SearchLink
-              data-cy="century"
-              className={`button mr-1 ${activeCenturies.includes('17') ? 'is-info' : ''}`}
-              params={{ centuries: ['17'] }}
-            >
-              17
-            </SearchLink>
-
-            <SearchLink
-              data-cy="century"
-              className={`button mr-1 ${activeCenturies.includes('18') ? 'is-info' : ''}`}
-              params={{ centuries: ['18'] }}
-            >
-              18
-            </SearchLink>
-
-            <SearchLink
-              data-cy="century"
-              className={`button mr-1 ${activeCenturies.includes('19') ? 'is-info' : ''}`}
-              params={{ centuries: ['19'] }}
-            >
-              19
-            </SearchLink>
-
-            <SearchLink
-              data-cy="century"
-              className={`button mr-1 ${activeCenturies.includes('20') ? 'is-info' : ''}`}
-              params={{ centuries: ['20'] }}
-            >
-              20
-            </SearchLink>
+            {centuriesList.map(century => (
+              <SearchLink
+                key={century}
+                data-cy="century"
+                className={`button mr-1 ${
+                  activeCenturies.includes(century) ? 'is-info' : ''
+                }`}
+                params={{
+                  centuries: activeCenturies.includes(century)
+                    ? activeCenturies.filter(c => c !== century)
+                    : [...activeCenturies, century],
+                }}
+              >
+                {century}
+              </SearchLink>
+            ))}
           </div>
 
           <div className="level-right ml-4">
             <SearchLink
               data-cy="centuryALL"
-              className={`button is-success ${activeCenturies.length !== 0 ? 'is-outlined' : ''}`}
+              className={`button is-success ${
+                activeCenturies.length !== 0 ? 'is-outlined' : ''
+              }`}
               params={{ centuries: [] }}
             >
               All

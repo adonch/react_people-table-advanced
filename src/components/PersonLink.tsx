@@ -1,6 +1,6 @@
 import React from 'react';
 import { Person } from '../types';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import classNames from 'classnames';
 
 type PersonLinkProps = {
@@ -8,6 +8,7 @@ type PersonLinkProps = {
 };
 
 const PersonLink: React.FC<PersonLinkProps> = ({ person }) => {
+  const location = useLocation();
   if (!person) {
     return null;
   }
@@ -15,7 +16,7 @@ const PersonLink: React.FC<PersonLinkProps> = ({ person }) => {
   return (
     <Link
       className={classNames({ 'has-text-danger': person.sex === 'f' })}
-      to={person.slug}
+      to={{ pathname: person.slug, search: location.search }}
     >
       {person.name}
     </Link>

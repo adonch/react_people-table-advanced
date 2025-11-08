@@ -2,14 +2,18 @@
 import React, { useMemo } from 'react';
 import { Person } from '../types/';
 import PersonLink from './PersonLink';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { SearchLink } from './SearchLink';
 
 type PeopleTableProps = {
   people: Person[];
 };
 
-const PeopleTable: React.FC<PeopleTableProps> = ({ people }) => {
+export const PeopleTable: React.FC<PeopleTableProps> = ({ people }) => {
   const params = useParams();
+  const [searchParams] = useSearchParams();
+  const currentSort = searchParams.get('sort');
+  const currentOrder = searchParams.get('order');
 
   const peopleWithFamily = useMemo(() => {
     return people.map(person => {
@@ -27,6 +31,61 @@ const PeopleTable: React.FC<PeopleTableProps> = ({ people }) => {
     });
   }, [people]);
 
+  const sortedPeople = useMemo(() => {
+    if (!currentSort) {
+      return peopleWithFamily;
+    }
+
+    const result = [...peopleWithFamily];
+    const key = currentSort as keyof Person;
+
+    result.sort((a, b) => {
+      const aValue = a[key];
+      const bValue = b[key];
+
+      if (aValue == null || bValue == null) {
+        return 0;
+      }
+
+      let comparison = 0;
+
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        comparison = aValue - bValue;
+      } else {
+        comparison = String(aValue).localeCompare(String(bValue));
+      }
+
+      // apply ascending/descending
+      return currentOrder === 'desc' ? -comparison : comparison;
+    });
+
+    return result;
+  }, [peopleWithFamily, currentSort, currentOrder]);
+
+  const getSortParamsFor = (field: string) => {
+    // зараз НЕ сортуємо по цьому полі → 1-й клік → сортуємо ASC
+    if (currentSort !== field) {
+      return {
+        sort: field,
+        order: null, // order відсутній → значить ascending
+      };
+    }
+
+    // вже сортуємо ASC по цьому полі → 2-й клік → ставимо DESC
+    if (currentSort === field && currentOrder !== 'desc') {
+      return {
+        sort: field,
+        order: 'desc',
+      };
+    }
+
+    // вже сортуємо DESC по цьому полі → 3-й клік → вимикаємо сортування
+    return {
+      sort: null,
+      order: null,
+    };
+  };
+
   return (
     <table
       data-cy="peopleTable"
@@ -34,17 +93,57 @@ const PeopleTable: React.FC<PeopleTableProps> = ({ people }) => {
     >
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Sex</th>
-          <th>Born</th>
-          <th>Died</th>
-          <th>Mother</th>
-          <th>Father</th>
+          <th>
+            <span className="is-flex is-flex-wrap-nowrap">
+              Name
+              <SearchLink params={getSortParamsFor('name')}>
+                <span className="icon">
+                  <i className="fas fa-sort" />
+                </span>
+              </SearchLink>
+            </span>
+          </th>
+          <th>
+            <span className="is-flex is-flex-wrap-nowrap">
+              Sex
+              <SearchLink params={getSortParamsFor('sex')}>
+                <span className="icon">
+                  <i className="fas fa-sort" />
+                </span>
+              </SearchLink>
+            </span>
+          </th>
+          <th>
+            <span className="is-flex is-flex-wrap-nowrap">
+              Born
+              <SearchLink params={getSortParamsFor('born')}>
+                <span className="icon">
+                  <i className="fas fa-sort" />
+                </span>
+              </SearchLink>
+            </span>
+          </th>
+          <th>
+            <span className="is-flex is-flex-wrap-nowrap">
+              Died
+              <SearchLink params={getSortParamsFor('died')}>
+                <span className="icon">
+                  <i className="fas fa-sort" />
+                </span>
+              </SearchLink>
+            </span>
+          </th>
+          <th>
+            <span className="is-flex is-flex-wrap-nowrap">Mother</span>
+          </th>
+          <th>
+            <span className="is-flex is-flex-wrap-nowrap">Father</span>
+          </th>
         </tr>
       </thead>
 
       <tbody>
-        {peopleWithFamily.map(person => (
+        {sortedPeople.map(person => (
           <tr
             data-cy="person"
             key={person.name}
@@ -82,5 +181,3 @@ const PeopleTable: React.FC<PeopleTableProps> = ({ people }) => {
     </table>
   );
 };
-
-export default PeopleTable;
