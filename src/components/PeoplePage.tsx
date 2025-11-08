@@ -41,7 +41,7 @@ const PeoplePage = () => {
 
     if (centuries.length > 0) {
       filtered = filtered.filter(person =>
-        centuries.includes((person.born + 100).toString().slice(0, 2)),
+        centuries.includes(Math.ceil(person.born / 100).toString()),
       );
     }
 

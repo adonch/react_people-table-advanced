@@ -59,7 +59,7 @@ export const PeopleFilters = () => {
             type="search"
             className="input"
             placeholder="Search"
-            defaultValue={activeQuery || ''}
+            value={activeQuery || ''}
             onChange={handleSearchChange}
           />
 

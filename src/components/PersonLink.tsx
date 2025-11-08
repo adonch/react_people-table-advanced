@@ -9,6 +9,7 @@ type PersonLinkProps = {
 
 const PersonLink: React.FC<PersonLinkProps> = ({ person }) => {
   const location = useLocation();
+
   if (!person) {
     return null;
   }
