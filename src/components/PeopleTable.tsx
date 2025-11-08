@@ -84,4 +84,3 @@ const PeopleTable: React.FC<PeopleTableProps> = ({ people }) => {
 };
 
 export default PeopleTable;
-

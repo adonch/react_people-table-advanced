@@ -9,13 +9,16 @@ export const PeopleFilters = () => {
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newQuery = event.target.value;
+
     setSearchParams(prev => {
       const newParams = new URLSearchParams(prev);
+
       if (newQuery) {
         newParams.set('query', newQuery);
       } else {
         newParams.delete('query');
       }
+
       return newParams;
     });
   };
